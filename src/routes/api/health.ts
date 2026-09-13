@@ -62,7 +62,7 @@ export const Route = createFileRoute("/api/health")({
               deployment: {
                 format: manifest?.vercelOutput ? "vercel-output" : "unknown",
                 contentSha256: manifest?.vercelOutput?.sha256 ?? null,
-                manifestAvailable: manifest?.vercelOutput !== null,
+                manifestAvailable: Boolean(manifest?.vercelOutput),
               },
               bridge: {
                 mode: "simulation",
