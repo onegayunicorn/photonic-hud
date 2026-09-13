@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 
 const root = resolve(process.cwd());
 const servedDir = resolve(root, process.env.PHOTONIC_SERVE_DIR ?? "dist");
-const manifestPath = resolve(root, "artifact-manifest.json");
+const manifestPath = resolve(servedDir, "artifact-manifest.json");
 
 function git(args) {
   return execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
@@ -36,8 +36,12 @@ function hashDirectory(directory) {
   return { sha256: hash.digest("hex"), fileCount: files.length };
 }
 
-if (!existsSync(manifestPath)) throw new Error("Ω-02 FAIL: artifact-manifest.json is missing");
-if (!existsSync(servedDir)) throw new Error(`Ω-02 FAIL: ${servedDir} is missing`);
+if (!existsSync(manifestPath)) {
+  throw new Error(`Ω-02 FAIL: ${manifestPath} is missing`);
+}
+if (!existsSync(servedDir)) {
+  throw new Error(`Ω-02 FAIL: ${servedDir} is missing`);
+}
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 const commitSha = git(["rev-parse", "HEAD"]);
