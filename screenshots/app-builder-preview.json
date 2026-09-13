@@ -1,0 +1,39 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Kyrexis Sovereign",
+      "hasCanvas": true,
+      "bodyTextLen": 1042,
+      "bodyTextHash": "3bd28604a0b00805d2d2d398c3fb839aa05949b89418e14cb6d52124bf21deae",
+      "bodyTextPrefix": "Kyrexis Sovereign PHOTONIC-Ω HUD Embodied τ 0.000 Run cycle Cycl",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Kyrexis Sovereign",
+      "hasCanvas": true,
+      "bodyTextLen": 941,
+      "bodyTextHash": "e64bd2350d3a332e7103dd7b1786660805ae7778fcbce24e80aea8be9b1a4a3a",
+      "bodyTextPrefix": "Kyrexis Sovereign Run cycle LAYER 3 — UNITARY CYCLE Photonic con",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [
+    "BRAND WARNING: this looks like a game/canvas app but src/lib/og/site.json is missing \"type\": \"x:game\". X uses og:type=x:game to present the unfurl as a game card — set it in /workspace/src/lib/og/site.json per /workspace/.grok/skills/og/SKILL.md. Do not invent x:type or overload twitter:card as the game signal.",
+    "BRAND WARNING: this looks like a game/canvas app but /workspace/public/x-banner.jpg is missing. Games need a 50:11 X feed card (1200×264 JPEG) at public/x-banner.jpg — open /workspace/.grok/skills/og/SKILL.md and finish the brand-asset pass."
+  ],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
