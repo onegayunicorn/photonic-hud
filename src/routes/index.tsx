@@ -9,6 +9,7 @@ import { SpectralBars } from "@/components/hud/SpectralBars";
 import { WeightChart } from "@/components/hud/WeightChart";
 import { TauGauge } from "@/components/hud/TauGauge";
 import { SovereignVault } from "@/components/hud/SovereignVault";
+import { EvidencePanel } from "@/components/hud/EvidencePanel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardMeta, CardTitle } from "@/components/ui/card";
 import { sampleSpectrum } from "@/lib/photonic/engine";
@@ -174,13 +175,24 @@ function CyclePage() {
           <WeightChart />
         </Card>
 
+        {/* Sovereign Bridge — EvidenceChain */}
+        <Card className="md:col-span-2 xl:col-span-1">
+          <CardHeader>
+            <div>
+              <CardTitle>Sovereign Bridge</CardTitle>
+              <CardMeta>SACB · ML-DSA-65 · EvidenceChain</CardMeta>
+            </div>
+          </CardHeader>
+          <EvidencePanel />
+        </Card>
+
         {/* Full Sovereign Vault */}
         <Card className="md:col-span-2 xl:col-span-3">
           <CardHeader>
             <div>
               <CardTitle>Sovereign Vault</CardTitle>
               <CardMeta>
-                Immutable Merkle ledger · phase + manual seals
+                Immutable Merkle ledger · phase + manual + bridge seals
               </CardMeta>
             </div>
           </CardHeader>
