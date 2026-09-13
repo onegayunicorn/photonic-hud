@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { sacb } from "@/lib/bridge/client";
 import { sealCurrentCycleToSACB } from "@/lib/bridge/seal";
+import { FIXTURE_TAU_1 } from "@/lib/bridge/fixtures";
 import type { BridgeStatus, SignedLeaf } from "@/lib/bridge/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,12 +63,9 @@ export function EvidencePanel() {
     );
   }
 
-  const modeTone =
-    status.backend_mode === "real"
-      ? "emerald"
-      : status.backend_mode === "auto"
-        ? "primary"
-        : "crimson";
+  const isReal =
+    status.backend_mode === "real" && status.liboqs_loaded === true;
+  const modeTone = isReal ? "emerald" : "crimson";
 
   return (
     <div className="flex flex-col gap-4">
@@ -86,10 +84,19 @@ export function EvidencePanel() {
           </span>
         </div>
         <Badge tone={modeTone}>
-          {status.backend_mode.toUpperCase()}
-          {status.liboqs_loaded ? " · native" : " · interface"}
+          {isReal ? "L1 REAL" : "L2 SIMULATION"}
+          {status.liboqs_loaded ? " · native" : " · interface only"}
         </Badge>
       </div>
+
+      {/* Explicit non-claim banner */}
+      {!isReal && (
+        <div className="rounded-md border border-crimson/20 bg-crimson/5 px-3 py-2 text-[11px] leading-relaxed text-muted">
+          <strong className="text-crimson">Non-claim:</strong> signatures are{" "}
+          <code className="text-foreground">SIM-MLDSA65-*</code>. Not
+          cryptographically binding. L1 requires real liboqs + promotion gate.
+        </div>
+      )}
 
       {/* Metrics grid */}
       <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-3">
@@ -120,7 +127,7 @@ export function EvidencePanel() {
             liboqs / ML-DSA
           </p>
           <p className="font-mono text-muted">
-            {status.liboqs_loaded ? "Native L1" : "Simulation L2"}
+            {status.liboqs_loaded ? "Native L1 path" : "Simulation L2"}
           </p>
         </div>
         <div>
@@ -128,7 +135,7 @@ export function EvidencePanel() {
             Evidence level
           </p>
           <p className="font-mono text-foreground">
-            {lastSeal?.evidence_level ?? "—"}
+            {lastSeal?.evidence_level ?? (isReal ? "L1 eligible" : "L2")}
           </p>
         </div>
         <div>
@@ -137,6 +144,14 @@ export function EvidencePanel() {
           </p>
           <p className="font-mono text-muted">ML-DSA-65</p>
         </div>
+      </div>
+
+      {/* Canonical reference (engine, not simplified formulas) */}
+      <div className="rounded-md bg-elevated px-3 py-2 font-mono text-[10px] text-muted">
+        Canonical τ=1 (engine): C {FIXTURE_TAU_1.coherence.toFixed(5)} · S{" "}
+        {FIXTURE_TAU_1.entropy.toFixed(3)} · F{" "}
+        {FIXTURE_TAU_1.fidelity.toFixed(4)} · mesh{" "}
+        {FIXTURE_TAU_1.meshCoherence.toFixed(4)}
       </div>
 
       {/* Action */}
@@ -153,6 +168,7 @@ export function EvidencePanel() {
         <div className="rounded-md border border-emerald/25 bg-emerald/5 p-3">
           <p className="mb-2 text-[10px] uppercase tracking-wider text-emerald">
             Leaf sealed · {lastSeal.evidence_level}
+            {lastSeal.evidence_level !== "L1" ? " (non-binding)" : ""}
           </p>
           <div className="space-y-0.5 font-mono text-[11px] leading-relaxed text-muted">
             <div>
@@ -163,6 +179,12 @@ export function EvidencePanel() {
               <span className="text-muted">τ </span>
               <span className="text-foreground">
                 {lastSeal.tau.toFixed(4)} · {lastSeal.phase}
+              </span>
+            </div>
+            <div>
+              <span className="text-muted">C/S </span>
+              <span className="text-foreground">
+                {lastSeal.coherence.toFixed(5)} / {lastSeal.entropy.toFixed(3)}
               </span>
             </div>
             <div>
@@ -185,9 +207,9 @@ export function EvidencePanel() {
       )}
 
       <p className="text-[10px] leading-relaxed text-muted">
-        Simulation signatures are interface-only (L2) and cannot be promoted to
-        L1. Real liboqs ML-DSA-65 + boundary seal upgrades the bridge to
-        production evidence.
+        Metrics are sealed from <code>metricsAt</code> (engine keyframes), not
+        simplified trig formulas. Simulation signatures remain L2 until the
+        full promotion gate passes (see BRIDGE_SPEC.md).
       </p>
     </div>
   );
