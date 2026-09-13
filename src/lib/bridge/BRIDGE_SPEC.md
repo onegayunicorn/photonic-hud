@@ -1,7 +1,7 @@
 # Sovereign Bridge Specification
 ## SACB ↔ Photonic-HUD Integration
 
-**Version**: 1.1 · KX-001-A17  
+**Version**: 1.2 · KX-001-A17  
 **Status**: ACTIVE — **L2 Simulation Only** (not cryptographically binding)
 
 ---
@@ -78,6 +78,44 @@ Output: `{ valid, signature_ok, root_match, evidence_level, message }`
 
 ---
 
+## Ω-02 Artifact Identity
+
+The browser-served artifact is `dist/` by default. `.vercel/output/` is the deployment
+bundle produced by the Nitro Vercel preset; it is not silently treated as the same
+artifact.
+
+`npm run build` now performs:
+
+1. Generate build identity from the exact Git `HEAD`.
+2. Build the application.
+3. Hash the emitted `dist/` contents using SHA-256 over sorted relative paths and
+   byte content.
+4. Hash `.vercel/output/` separately when present.
+5. Write `dist/artifact-manifest.json` (and the Vercel static output copy) with both
+   identities.
+
+`artifact-manifest.json` is excluded from the content hash to avoid a self-referential
+hash. The manifest itself records the hashing method and exclusion explicitly.
+
+`GET /api/health` reads the served manifest and reports:
+
+- exact source commit SHA;
+- build ID and build timestamp;
+- served artifact SHA-256 and file count;
+- Vercel output SHA-256 when present;
+- `identityPass`, which is false when the manifest is absent or its source identity
+  does not match the running build.
+
+A failed identity check returns HTTP **503**, not a successful health response.
+
+`npm run verify:artifact` independently recomputes the served artifact hash and fails
+closed on commit, path, hash, or file-count mismatch.
+
+The artifact hash is a **content identity**, not a cryptographic security claim about
+the application. It does not promote SACB from L2 to L1.
+
+---
+
 ## Promotion Rules (Ω-05 gate)
 
 Simulation signatures (`SIM-MLDSA65-*`) are **L2 only** and **cannot** be promoted to L1 by configuration flag alone.
@@ -107,9 +145,9 @@ Non-claims (always):
 
 1. ✅ Simulation Bridge (current) — L2
 2. ✅ Canonical fixtures + engine invariants tests
-3. ⬜ Artifact identity (commit SHA + build hash on health endpoint)
-4. ⬜ Install liboqs → enable real ML-DSA-65
-5. ⬜ SACB local API server (`:8787`)
+3. ✅ Ω-02 artifact identity implementation — **runtime verification still required**
+4. ⬜ Ω-03 SACB runtime smoke + captured seal evidence
+5. ⬜ Install liboqs → enable real ML-DSA-65
 6. ⬜ HUD ↔ SACB round-trip CI test
 7. ⬜ EvidenceChain promotion automation (gate above)
 8. ⬜ Cross-plane L1 production seal
@@ -120,10 +158,16 @@ Non-claims (always):
 
 | Path | Role |
 |------|------|
+| `scripts/generate-build-info.mjs` | Build/source identity generator |
+| `scripts/finalize-artifact.mjs` | Deterministic artifact manifest generator |
+| `scripts/verify-artifact.mjs` | Fail-closed artifact verifier |
+| `src/generated/build-info.ts` | Build-time identity consumed by runtime |
+| `src/routes/api/health.ts` | Runtime provenance health endpoint |
 | `src/lib/bridge/types.ts` | Shared DTOs |
 | `src/lib/bridge/client.ts` | SACBClient (mock + real) |
 | `src/lib/bridge/seal.ts` | HUD → SACB seal flow |
 | `src/lib/bridge/fixtures.ts` | Canonical τ checkpoints from engine |
 | `src/lib/bridge/fixtures.test.ts` | Deterministic fixture + invariant tests |
 | `src/components/hud/EvidencePanel.tsx` | Crypto status UI |
+| `src/components/layout/AppShell.tsx` | HUD shell + build identity footer |
 | `src/lib/bridge/BRIDGE_SPEC.md` | This document |
