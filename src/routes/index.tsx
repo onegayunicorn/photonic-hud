@@ -7,10 +7,11 @@ import { PhaseTimeline } from "@/components/hud/PhaseTimeline";
 import { PolarField } from "@/components/hud/PolarField";
 import { SpectralBars } from "@/components/hud/SpectralBars";
 import { WeightChart } from "@/components/hud/WeightChart";
+import { TauGauge } from "@/components/hud/TauGauge";
+import { SovereignVault } from "@/components/hud/SovereignVault";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardMeta, CardTitle } from "@/components/ui/card";
 import { sampleSpectrum } from "@/lib/photonic/engine";
-import { shortHash } from "@/lib/photonic/hash";
 import { phaseAt } from "@/lib/photonic/phases";
 import { useKyrexis } from "@/lib/photonic/store";
 
@@ -18,24 +19,25 @@ export const Route = createFileRoute("/")({ component: CyclePage });
 
 function CyclePage() {
   const m = useKyrexis((s) => s.metrics);
-  const chain = useKyrexis((s) => s.chain);
-  const chainOk = useKyrexis((s) => s.chainOk);
   const phase = phaseAt(m.tau);
   const spec = sampleSpectrum(m.tau, 12);
-  const leaf = chain.length ? chain[chain.length - 1] : undefined;
 
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <p className="font-mono text-xs tracking-widest text-muted">LAYER 3 — UNITARY CYCLE</p>
+        <p className="font-mono text-xs tracking-widest text-muted">
+          LAYER 3 — UNITARY CYCLE
+        </p>
         <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
           Photonic condensation
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          {phase.signature}. Tempo {phase.tempo}. The pattern is not created — it is re-represented.
+          {phase.signature}. Tempo {phase.tempo}. The pattern is not created — it
+          is re-represented.
         </p>
       </div>
 
+      {/* Primary visual: Filaments + System state */}
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="overflow-hidden p-0 lg:col-span-3">
           <div className="relative h-72 sm:h-80">
@@ -62,23 +64,53 @@ function CyclePage() {
           <MetricRow
             label="Coherence C"
             value={m.coherence.toFixed(5)}
-            tone={m.coherence > 0.9 ? "primary" : m.coherence > 0.7 ? "amber" : "crimson"}
+            tone={
+              m.coherence > 0.9
+                ? "primary"
+                : m.coherence > 0.7
+                  ? "amber"
+                  : "crimson"
+            }
           />
           <MetricRow
             label="Entropy S"
             value={m.entropy.toFixed(3)}
-            tone={m.entropy < 0.5 ? "indigo" : m.entropy < 1.4 ? "amber" : "crimson"}
+            tone={
+              m.entropy < 0.5
+                ? "indigo"
+                : m.entropy < 1.4
+                  ? "amber"
+                  : "crimson"
+            }
           />
           <MetricRow label="Gamma lock" value={`${m.gammaFreq.toFixed(1)} Hz`} />
           <MetricRow label="Filaments" value={String(m.filaments)} tone="muted" />
         </Card>
       </div>
 
+      {/* τ Engine — dual-curve gauge */}
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>τ Engine · Live Phase Evolution</CardTitle>
+            <CardMeta>
+              Cyan = coherence · Crimson dashed = entropy · Collapse flash at
+              τ≈0.33
+            </CardMeta>
+          </div>
+        </CardHeader>
+        <TauGauge />
+      </Card>
+
+      {/* Phase track + classic controls */}
       <Card>
         <CardHeader>
           <div>
             <CardTitle>Phase track</CardTitle>
-            <CardMeta>Tap a phase to scrub. Embodied → Collapse → Photonic → Seeding → Growth → New Being</CardMeta>
+            <CardMeta>
+              Tap a phase to scrub. Embodied → Collapse → Photonic → Seeding →
+              Growth → New Being
+            </CardMeta>
           </div>
         </CardHeader>
         <PhaseTimeline />
@@ -87,6 +119,7 @@ function CyclePage() {
         </div>
       </Card>
 
+      {/* Secondary grid */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Card>
           <CardHeader>
@@ -115,7 +148,8 @@ function CyclePage() {
             <div>
               <CardTitle>Spectral invariance</CardTitle>
               <CardMeta>
-                Fidelity {(spec.fidelity * 100).toFixed(1)}% · r {spec.correlation.toFixed(3)}
+                Fidelity {(spec.fidelity * 100).toFixed(1)}% · r{" "}
+                {spec.correlation.toFixed(3)}
               </CardMeta>
             </div>
           </CardHeader>
@@ -140,26 +174,17 @@ function CyclePage() {
           <WeightChart />
         </Card>
 
-        <Card>
+        {/* Full Sovereign Vault */}
+        <Card className="md:col-span-2 xl:col-span-3">
           <CardHeader>
             <div>
-              <CardTitle>Merkle leaf</CardTitle>
-              <CardMeta>{chainOk ? "Chain verified" : "Chain breached"}</CardMeta>
+              <CardTitle>Sovereign Vault</CardTitle>
+              <CardMeta>
+                Immutable Merkle ledger · phase + manual seals
+              </CardMeta>
             </div>
-            <span
-              className={
-                chainOk
-                  ? "size-2 rounded-full bg-emerald"
-                  : "size-2 rounded-full bg-crimson"
-              }
-            />
           </CardHeader>
-          <div className="rounded-md bg-elevated p-3 font-mono text-xs leading-relaxed text-muted break-all">
-            {leaf ? shortHash(leaf.hash, 32) : "hydrating…"}
-          </div>
-          <p className="mt-3 text-xs text-muted">
-            {chain.length} sealed records · {leaf?.module ?? "—"}
-          </p>
+          <SovereignVault />
         </Card>
       </div>
     </div>
