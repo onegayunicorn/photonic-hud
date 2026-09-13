@@ -35,10 +35,7 @@ function hashDirectory(directory, { excludeNames = new Set() } = {}) {
     hash.update(bytes);
     hash.update("\0");
   }
-  return {
-    sha256: hash.digest("hex"),
-    fileCount: files.length,
-  };
+  return { sha256: hash.digest("hex"), fileCount: files.length };
 }
 
 if (!existsSync(servedDir)) {
@@ -58,11 +55,7 @@ const buildId = buildIdMatch?.[1] ?? "unknown";
 const manifest = {
   schema: "photonic-hud/artifact-identity/v1",
   generatedAt: new Date().toISOString(),
-  source: {
-    commitSha,
-    branch,
-    buildId,
-  },
+  source: { commitSha, branch, buildId },
   hashing: {
     algorithm: "sha256",
     method: "sorted-relative-path-and-byte-content",
@@ -81,7 +74,6 @@ const manifest = {
 };
 
 const json = JSON.stringify(manifest, null, 2) + "\n";
-writeFileSync(resolve(root, "artifact-manifest.json"), json, "utf8");
 writeFileSync(resolve(servedDir, "artifact-manifest.json"), json, "utf8");
 
 const vercelStatic = resolve(vercelDir, "static");
