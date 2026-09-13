@@ -17,6 +17,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { phaseAt } from "@/lib/photonic/phases";
 import { useKyrexis } from "@/lib/photonic/store";
+import { buildInfo } from "@/generated/build-info";
 import { cn } from "@/lib/utils";
 
 const PRIMARY_NAV = [
@@ -166,6 +167,15 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <main className="min-w-0 flex-1 px-3 py-5 pb-24 lg:px-6 lg:pb-8">{children}</main>
         </div>
+
+        <footer className="border-t border-border px-3 py-2.5 lg:px-5">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 font-mono text-[10px] text-muted">
+            <span>Evidence: L2 simulation · non-binding</span>
+            <span title={buildInfo.commitSha}>
+              Build {buildInfo.shortSha} · {buildInfo.buildTime.slice(0, 10)}
+            </span>
+          </div>
+        </footer>
 
         <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-bg/95 lg:hidden">
           <ul className="grid grid-cols-5">
