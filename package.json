@@ -8,7 +8,10 @@
   },
   "scripts": {
     "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
+    "prebuild": "node scripts/generate-build-info.mjs",
     "build": "node scripts/with-app-env.mjs vite build && npm run db:migrate",
+    "postbuild": "node scripts/finalize-artifact.mjs",
+    "verify:artifact": "node scripts/verify-artifact.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "build:dev": "node scripts/with-app-env.mjs vite build --mode development",
     "preview": "node scripts/with-app-env.mjs vite preview",
